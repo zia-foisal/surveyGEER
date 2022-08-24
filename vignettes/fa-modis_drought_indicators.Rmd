@@ -34,7 +34,7 @@ library(sf)
 library(tidyrgee)
 ee_Initialize()
 devtools::load_all()
-country_code <- c("ssd","eth","som")[1]
+country_code <- c("ssd","eth","bgd")[3]
 baseline_years <- c(2000:2015)
 ```
 
@@ -44,7 +44,7 @@ baseline_years <- c(2000:2015)
 ```{r}
 
 con <- DBI::dbConnect(RPostgres::Postgres(),
-                      dbname = "global_gdb",
+                      dbname = "ziaexp",
                       user      = rstudioapi::askForPassword("Database user"),
                       password      = rstudioapi::askForPassword("Database password"),
                       port     = 5432)
@@ -253,7 +253,13 @@ grid_with_ndvi_pcts <- grid_with_ndvi_indicators |>
     VCI = round(VCI*100,1)
     )
 
-
+hex_grid_clipped|> 
+  st_transform(crs=4326) |> 
+  left_join(grid_with_ndvi_pcts, by="grid_id") |> 
+  st_write(
+    #"C:\\Users\\zack.arno\\Documents\\GeoCrunch\\Impact\\projects\\impact-initiatives-geospatial\\REACH_SOM\\som_hex_climate_maps.gpkg",
+    "E:\\Synology\\BGD Drought Monitoring\\bgd_hex_climate_maps_v1.gpkg",
+    paste0(country_code,"_hex_ndvi_base", max(baseline_years)), delete_layer=T,overwrite=T)
 
 ```
 
@@ -271,7 +277,8 @@ hex_grid_clipped|>
   st_transform(crs=4326) |> 
   left_join(grid_with_ndvi_yrmo, by="grid_id") |> 
   st_write(
-    "C:\\Users\\zack.arno\\Documents\\GeoCrunch\\Impact\\projects\\impact-initiatives-geospatial\\REACH_SOM\\som_hex_climate_maps.gpkg",
+    #"C:\\Users\\zack.arno\\Documents\\GeoCrunch\\Impact\\projects\\impact-initiatives-geospatial\\REACH_SOM\\som_hex_climate_maps.gpkg",
+    "E:\\Synology\\BGD Drought Monitoring\\bgd_hex_climate_maps_v1.gpkg",
     paste0(country_code,"_hex_ndvi_base", max(baseline_years)), delete_layer=T,overwrite=T)
 ```
 
@@ -280,13 +287,13 @@ create victim file
 
 ```{r}
 
-som_adm0_dissolved <- st_read(con,"som_adm1") |> 
+bgd_adm0_dissolved <- st_read(con,"bgd_adm1") |> 
   summarise() |> 
   mutate(uid=1)
 
-atlas_victim <- som_adm0_dissolved |> 
+atlas_victim <- bgd_adm0_dissolved |> 
   left_join(
-  grid_with_ndvi |> 
+  grid_with_ndvi_yrmo |> 
   mutate(yr_mo = paste0(lubridate::month(date,label=T,abbr = F)," ",lubridate::year(date))) |> 
   distinct(date, yr_mo) |> 
   mutate(uid=1)   
@@ -297,8 +304,8 @@ atlas_victim |> print(n=17)
 
 atlas_victim|> 
   st_write(
-    "C:\\Users\\zack.arno\\Documents\\GeoCrunch\\Impact\\projects\\impact-initiatives-geospatial\\REACH_SOM\\som_hex_climate_maps.gpkg",
-    "som_atlas_coverage",delete_layer=T, overwrite=T
+    "E:\\Synology\\BGD Drought Monitoring\\bgd_hex_climate_maps_v1.gpkg",
+    "bgd_atlas_coverage",delete_layer=T, overwrite=T
   )
   
 
