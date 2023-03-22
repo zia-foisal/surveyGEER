@@ -4,7 +4,7 @@
 \alias{decouple_coordinates}
 \title{setup geo data}
 \usage{
-decouple_coordinates(df, uuid, lon, lat, pw)
+decouple_coordinates(df, uuid, lon, lat, cols_to_keep = NULL, pw)
 }
 \arguments{
 \item{df}{data.frame}

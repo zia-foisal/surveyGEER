@@ -12,6 +12,13 @@ data_share/*
 *.csv
 R/setup_geo_data.R
 vignettes/workflow.Rmd
+/scrap/*
+*.kml
+
+*.rds
+*_report.Rmd
+*.html
+*workflow2.rmd
 
 
 *.xlsx
@@ -22,3 +29,5 @@ data/*
 map_templates/map_outputs/*
 R/decouple_coordinates.R
 local_jobs/*
+workflow_tutorial_files/*
+col_target_rs_report_files/*
